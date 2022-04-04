@@ -1,9 +1,10 @@
 import styled from 'styled-components';
 
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br';
+import axios from 'axios';
+import { useContext } from "react";
 
 import displayDefault from '../../assets/styles/displayDefault';
 import fontDefault from '../../assets/styles/fontDefault';
@@ -12,33 +13,49 @@ import Header from '../Header';
 import HabitBox2 from '../HabitBox2';
 import ProgressBar from '../ProgressBar';
 import Footer from '../Footer';
+import UserContext from "../../contexts/UserContext";
 
 
 export default function Today() {
-    const habitsArray =
-        [
-            {
-                "id": 3,
-                "name": "Acordar",
-                "done": true,
-                "currentSequence": 1,
-                "highestSequence": 1
-            },
-            {
-                "id": 4,
-                "name": "Comer",
-                "done": true,
-                "currentSequence": 1,
-                "highestSequence": 5
-            },
-            {
-                "id": 5,
-                "name": "Ouvir música",
-                "done": false,
-                "currentSequence": 3,
-                "highestSequence": 4
+    const url = "https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/today";
+    const config = {
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    }
+
+    const [doneHabit, setDoneHabit] = useState(0);
+
+    function donePercentage() {
+        const percentage = parseInt((doneHabit / (habitsArray.length > 0 ? habitsArray.length : 1)) * 100);
+
+        if(percentage === 0) {
+            return ["#BABABA", "Nenhum hábito concluído ainda"]
+        }
+        else {
+            return ["#8FC549", `${percentage}% dos hábitos concluídos`];
+        }
+    };
+
+    const [habitsArray, setHabitsArray] = useState([]);
+    const { percentage, setPercentage } = useContext(UserContext);
+    setPercentage(parseInt((doneHabit / (habitsArray.length > 0 ? habitsArray.length : 1)) * 100));
+
+    useEffect(() => {
+		const habitsRequisition = axios.get(url, config);
+
+		habitsRequisition.then(answer => {
+			setHabitsArray([...answer.data]);
+            if(habitsArray.length > 0) {
+                habitsArray.forEach(element => {
+                    if(element.done === true) {
+                        setDoneHabit(doneHabit+1);
+                    }
+                });
             }
-        ];
+		});
+        habitsRequisition.catch(() => alert("Erro!"));
+    }, []);
 
     const localeData = require('dayjs/plugin/localeData')
     dayjs.extend(localeData)
@@ -55,19 +72,6 @@ export default function Today() {
     const day = dayjs().get('date');
     const month = dayjs().get('month')+1;
 
-    const [done, setDone] = useState(1);
-
-    function donePercentage() {
-        const percentage = parseInt((done / habitsArray.length) * 100);
-
-        if(percentage === 0) {
-            return ["#BABABA", "Nenhum hábito concluído ainda"]
-        }
-        else {
-            return ["#8FC549", `${percentage}% dos hábitos concluídos`];
-        }
-    };
-
     return (
         <TodayBody>
             <Header />
@@ -79,7 +83,7 @@ export default function Today() {
                 const {id, name, done, currentSequence, highestSequence} = element;
                 
                 return (
-                    <HabitBox2 name={name} done={done} currentSequence={currentSequence} highestSequence={highestSequence} key={id} />
+                    <HabitBox2 name={name} done={done} currentSequence={currentSequence} highestSequence={highestSequence} id={id} func={setHabitsArray} key={id} />
                 );
             }
             )}
@@ -92,7 +96,7 @@ export default function Today() {
 const TodayBody = styled.div`
     box-sizing: border-box;
     width: 100vw;
-    height: 100vh;
+    height: 100%;
     background-color: #E5E5E5;
     ${displayDefault};
     flex-direction: column;

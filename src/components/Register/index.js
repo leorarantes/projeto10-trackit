@@ -1,7 +1,9 @@
 import styled from 'styled-components';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom'
 import { Link } from "react-router-dom";
 import { ThreeDots } from 'react-loader-spinner';
+import axios from 'axios';
 
 import displayDefault from '../../assets/styles/displayDefault';
 import fontDefault from '../../assets/styles/fontDefault';
@@ -9,19 +11,46 @@ import fontDefault from '../../assets/styles/fontDefault';
 import logo from "../../assets/img/logo.svg"
 
 export default function Register() {
-    const [loading, setLoading] = useState("Cadastrar");
+    const navigate = useNavigate();
+    const url = "https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/auth/sign-up";
 
+    const [loading, setLoading] = useState("Cadastrar");
     function load() {
         setLoading(<ThreeDots color="#FFFFFF" height={50} width={50} />);
+        const loginRequisition = axios.post(url, user);
+        loginRequisition.then(answer => {
+            navigate('/', { replace: true })
+        });
+        loginRequisition.catch(answer => {
+            alert("Erro!");
+        })
     }
+
+    const [user, setUser] = useState({ email: "", name: "", image: "", password: "" });
 
     return (
         <HomeBody>
             <Logo src={logo} />
-            <HomeInput type="text" placeholder="email" />
-            <HomeInput type="text" placeholder="senha" />
-            <HomeInput type="text" placeholder="nome" />
-            <HomeInput type="text" placeholder="foto" />
+            <HomeInput type="text" placeholder="email" value={user.email} onChange={e => {
+                const obj = { ...user };
+                obj.email = e.target.value;
+                setUser({ ...obj });
+            }} />
+            <HomeInput type="text" placeholder="nome" value={user.name} onChange={e => {
+                const obj = { ...user };
+                obj.name = e.target.value;
+                setUser({ ...obj });
+            }} />
+            <HomeInput type="text" placeholder="imagem" value={user.image} onChange={e => {
+                const obj = { ...user };
+                obj.image = e.target.value;
+                setUser({ ...obj });
+            }} />
+            <HomeInput type="text" placeholder="senha" value={user.password} onChange={e => {
+                const obj = { ...user };
+                obj.password = e.target.value;
+                setUser({ ...obj });
+            }} />
             <BlueButton onClick={() => load()}>{loading}</BlueButton>
             <Link to="/"><AlternativeLink>Já tem uma conta? Faça login!</AlternativeLink></Link>
         </HomeBody>

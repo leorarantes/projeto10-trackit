@@ -1,8 +1,5 @@
 import styled from 'styled-components';
 
-import { useState } from "react";
-import { Link } from "react-router-dom";
-
 import displayDefault from '../../assets/styles/displayDefault';
 import fontDefault from '../../assets/styles/fontDefault';
 

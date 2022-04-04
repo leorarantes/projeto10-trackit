@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import axios from 'axios';
 
 import displayDefault from '../../assets/styles/displayDefault';
 import fontDefault from '../../assets/styles/fontDefault';
@@ -14,18 +14,24 @@ import Footer from '../Footer';
 
 
 export default function Habits() {
-    const habitsArray = [
-        {
-            id: 1,
-            name: "Nome do hábito",
-            days: [1, 3, 5]
-        },
-        {
-            id: 2,
-            name: "Nome do hábito 2",
-            days: [1, 3, 4, 6]
+    const url = "https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits";
+    const config = {
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
         }
-    ];
+    }
+
+    const [habitsArray, setHabitsArray] = useState([]);
+
+    useEffect(() => {
+		const habitsRequisition = axios.get(url, config);
+
+		habitsRequisition.then(answer => {
+            console.log(answer.data);
+			setHabitsArray([...answer.data]);
+		});
+        habitsRequisition.catch(() => alert("Erro!"));
+    }, []);
 
     const [textVisibility, setTextVisibility] = useState("visible");
     const [newHabitBoxVisibility, setNewHabitBoxVisibility] = useState("none");
@@ -41,8 +47,8 @@ export default function Habits() {
                 <h1>Meus hábitos</h1>
                 <Plus onClick={() => setNewHabitBoxVisibility("default")}><h1>+</h1></Plus>
             </Box>
-            <NewHabitBox visibility={newHabitBoxVisibility} func={setNewHabitBoxVisibility} />
-            {habitsArray.map(element => {
+            <NewHabitBox visibility={newHabitBoxVisibility} func1={setNewHabitBoxVisibility} func2={setHabitsArray} />
+            {habitsArray.length > 0 ? habitsArray.map(element => {
                 const {id, name, days} = element;
                 const obj = [
                     { color: "#FFFFFF", fontColor: "#DBDBDB" },
@@ -54,14 +60,14 @@ export default function Habits() {
                     { color: "#FFFFFF", fontColor: "#DBDBDB" },
                 ];
                 days.forEach(element => {
-                    obj[element-1].color = "#DBDBDB";
-                    obj[element-1].fontColor = "#FFFFFF";
+                    obj[element].color = "#DBDBDB";
+                    obj[element].fontColor = "#FFFFFF";
                 });
 
                 return (
-                    <HabitBox1 name={name} obj={obj} key={id} />
+                    <HabitBox1 name={name} obj={obj} id={id} func={setHabitsArray} key={id} />
                 );
-            })}
+            }) : () => { return (<></>)}}
             <Text visibility={textVisibility}>Você não tem nenhum hábito cadastrado ainda. Adicione um hábito para começar a trackear!</Text>
             <ProgressBar />
             <Footer />
@@ -72,7 +78,7 @@ export default function Habits() {
 const HabitsBody = styled.div`
     box-sizing: border-box;
     width: 100vw;
-    height: 100vh;
+    height: 100%;
     background-color: #E5E5E5;
     ${displayDefault};
     flex-direction: column;

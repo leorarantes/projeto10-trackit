@@ -1,15 +1,29 @@
-import { useState } from "react";
 import styled from 'styled-components';
+import axios from "axios";
 
 import displayDefault from '../../assets/styles/displayDefault';
 import fontDefault from '../../assets/styles/fontDefault';
 
 export default function HabitBox1(props) {
-    const {name, obj} = props;
+    const config = {
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    }
+
+    const {name, obj, id, func} = props;
+    const url = `https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/${id}`;
+    
 
     function deleteHabit() {
-
-        setTimeout(() => window.location.reload(), 2000);
+        const deleteRequisition = axios.delete(url, config);
+        deleteRequisition.then(() => {
+            const habitsRequisition = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits", config);
+            habitsRequisition.then(answer => {
+                func([...answer.data]);
+            });
+            habitsRequisition.catch(() => alert("Erro!"));
+        });
     }
 
     return (

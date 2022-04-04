@@ -1,11 +1,18 @@
 import { useState } from "react";
 import styled from 'styled-components';
 import { ThreeDots } from 'react-loader-spinner';
+import axios from "axios";
 
 import displayDefault from '../../assets/styles/displayDefault';
 import fontDefault from '../../assets/styles/fontDefault';
 
 export default function NewHabitBox(props) {
+    const url = "https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits";
+    const config = {
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    }
     const {visibility} = props;
     
     const [daysArray, setDaysArray] = useState([
@@ -38,21 +45,38 @@ export default function NewHabitBox(props) {
     const [habitName, setHabitName] = useState("");
 
     function save() {
+        setLoading(<ThreeDots color="#FFFFFF" height={30} width={30} />);
+
         const daysArr = [];
 
         daysArray.forEach((element, index) => {
             if(element.fontColor === "#FFFFFF") {
-                daysArr.push(index+1);
+                daysArr.push(index);
             }
         });
 
         const obj = {name: habitName, days: daysArr};
-        console.log(obj);
-
-        setLoading(<ThreeDots color="#FFFFFF" height={30} width={30} />);
+        
         setTimeout(() => {
-            window.location.reload();
-            
+            const newHabitRequisition = axios.post(url, obj, config);
+            newHabitRequisition.then(answer => {
+                console.log(answer.data);
+                const habitsRequisition = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits", config);
+
+                habitsRequisition.then(answer => {
+                    props.func1("none");
+                    daysArray.forEach(element => {
+                        element.color = "#FFFFFF"
+                        element.fontColor = "#DBDBDB";
+                    });
+                    setLoading("Salvar");
+                    props.func2([...answer.data]);
+                    setHabitName("");
+                });
+                habitsRequisition.catch(() => alert("Erro!"));
+            }
+            );
+            newHabitRequisition.catch(() => alert("Erro!"));
         }, 2000);
     }
 
@@ -68,7 +92,7 @@ export default function NewHabitBox(props) {
                 <Weekday onClick={() => markDay(5)} color={daysArray[5].color} fontColor={daysArray[5].fontColor}><h1>S</h1></Weekday>
                 <Weekday onClick={() => markDay(6)} color={daysArray[6].color} fontColor={daysArray[6].fontColor}><h1>S</h1></Weekday>
             </Box>
-            <Cancel onClick={() => props.func("none")}>Cancelar</Cancel>
+            <Cancel onClick={() => props.func1("none")}>Cancelar</Cancel>
             <Save onClick={() => save()}>{loading}</Save>
         </Conteiner>
     );

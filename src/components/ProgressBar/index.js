@@ -1,14 +1,16 @@
 import { Link } from 'react-router-dom';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import { useState } from "react";
 import styled from 'styled-components';
+import { useContext } from "react";
 
 import displayDefault from '../../assets/styles/displayDefault';
 import fontDefault from '../../assets/styles/fontDefault';
 
+import UserContext from "../../contexts/UserContext";
+
 export default function ProgressBar() {
-    const [percentage, setPercentage] = useState(60);
+    const { percentage, setPercentage } = useContext(UserContext);
 
     return (
         <Link to="/hoje">

@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 
 import displayDefault from '../../assets/styles/displayDefault';
-import fontDefault from '../../assets/styles/fontDefault';
 
 import logo from "../../assets/img/small-logo.svg"
 import spongeBob from "../../assets/img/sponge-bob.png"
