@@ -1,7 +1,10 @@
 import styled from 'styled-components';
 import axios from "axios";
+import { useContext } from "react";
 
 import fontDefault from '../../assets/styles/fontDefault';
+
+import UserContext from "../../contexts/UserContext";
 
 export default function HabitBox2(props) {
     const config = {
@@ -10,31 +13,42 @@ export default function HabitBox2(props) {
         }
     }
 
-    const { name, done, currentSequence, highestSequence, id, func } = props;
+    const { percentage, setPercentage } = useContext(UserContext);
+    const { name, done, currentSequence, highestSequence, id, arr, index, setHabitsArray } = props;
     const checkUrl = `https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/${id}/check`;
     const uncheckUrl = `https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/${id}/uncheck`;
 
-    function setDoneHabit() {
+    function setDone() {
         if (done === false) {
             const checkRequisition = axios.post(checkUrl, null, config);
             checkRequisition.then(() => {
-                const habitsRequisition = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/today", config);
-                habitsRequisition.then(answer => {
-                    func([...answer.data]);
+                let i=0;
+                arr.forEach(element => {
+                    if(element.done === true) {
+                        i++;
+                    }
                 });
-                habitsRequisition.catch(() => alert("Erro na habitsRequisition"));
-            })
+                i++;
+                setPercentage(parseInt((i / (arr.length > 0 ? arr.length : 1)) * 100));
+                arr[index].done = true;
+                setHabitsArray([...arr]);
+            });
             checkRequisition.catch(() => alert("Erro na checkRequisition"));
         }
         else {
             const uncheckRequisition = axios.post(uncheckUrl, null, config);
             uncheckRequisition.then(() => {
-                const habitsRequisition = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/today", config);
-                habitsRequisition.then(answer => {
-                    func([...answer.data]);
+                let i=0;
+                arr.forEach(element => {
+                    if(element.done === true) {
+                        i++;
+                    }
                 });
-                habitsRequisition.catch(() => alert("Erro na habitsRequisition"));
-            })
+                i--;
+                setPercentage(parseInt((i / (arr.length > 0 ? arr.length : 1)) * 100));
+                arr[index].done = false;
+                setHabitsArray([...arr]);
+            });
             uncheckRequisition.catch(() => alert("Erro na uncheckRequisition"));
         }
     }
@@ -46,7 +60,7 @@ export default function HabitBox2(props) {
                 <h2>Sequencia atual: <span>{currentSequence} {currentSequence === 1 ? "dia" : "dias"}</span></h2>
                 <h2>Seu recorde: <span>{highestSequence} {highestSequence === 1 ? "dia" : "dias"}</span></h2>
             </Box>
-            <Button onClick={() => setDoneHabit()} color={done ? "#8FC549" : "#E7E7E7"}><ion-icon name="checkmark-outline"></ion-icon></Button>
+            <Button onClick={() => setDone()} color={done ? "#8FC549" : "#E7E7E7"}><ion-icon name="checkmark-outline"></ion-icon></Button>
         </Conteiner>
     );
 }
@@ -111,3 +125,34 @@ const Button = styled.button`
         color: #FFFFFF;
     }
 `;
+
+
+/*
+                const habitsRequisition = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/today", config);
+                habitsRequisition.then(answer => {
+                    if (answer.data.length > 0) {
+                        answer.data.forEach(element => {
+                            if (element.done === true) {
+                                func2(doneHabit + 1);
+                            }
+                        });
+                    }
+                    func1([...answer.data]);
+                });
+                habitsRequisition.catch(() => alert("Erro na habitsRequisition"));
+
+                                const habitsRequisition = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/today", config);
+                habitsRequisition.then(answer => {
+                    if (answer.data.length > 0) {
+                        answer.data.forEach(element => {
+                            if (element.done === true) {
+                                func2(doneHabit - 1);
+                            }
+                        });
+                    }
+                    func1([...answer.data]);
+                });
+                habitsRequisition.catch(() => alert("Erro na habitsRequisition"));
+*/
+
+//func1, func2, doneHabit

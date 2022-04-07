@@ -27,7 +27,7 @@ export default function Home() {
             localStorage.setItem("password", password);
             localStorage.setItem("token", token);
             
-            navigate('/habitos', { replace: true })
+            navigate('/hoje', { replace: true })
         });
         loginRequisition.catch(answer => {
             alert("Erro!");

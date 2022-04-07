@@ -27,7 +27,6 @@ export default function Habits() {
 		const habitsRequisition = axios.get(url, config);
 
 		habitsRequisition.then(answer => {
-            console.log(answer.data);
 			setHabitsArray([...answer.data]);
 		});
         habitsRequisition.catch(() => alert("Erro!"));

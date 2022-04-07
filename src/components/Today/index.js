@@ -24,39 +24,35 @@ export default function Today() {
         }
     }
 
-    const [doneHabit, setDoneHabit] = useState(0);
+    const { percentage, setPercentage } = useContext(UserContext);
+    const [habitsArray, setHabitsArray] = useState([]);
+
+    useEffect(() => {
+        const habitsRequisition = axios.get(url, config);
+
+        habitsRequisition.then(answer => {
+            const arr = [...answer.data];
+            let i=0;
+            arr.forEach(element => {
+                if(element.done === true) {
+                    i++;
+                }
+            });
+            setPercentage(parseInt((i / (arr.length > 0 ? arr.length : 1)) * 100));
+            setHabitsArray([...arr]);
+        });
+        habitsRequisition.catch(() => alert("Erro!"));
+    }, []);
 
     function donePercentage() {
-        const percentage = parseInt((doneHabit / (habitsArray.length > 0 ? habitsArray.length : 1)) * 100);
-
-        if(percentage === 0) {
+        if (percentage === 0) {
             return ["#BABABA", "Nenhum hábito concluído ainda"]
         }
         else {
             return ["#8FC549", `${percentage}% dos hábitos concluídos`];
         }
     };
-
-    const [habitsArray, setHabitsArray] = useState([]);
-    const { percentage, setPercentage } = useContext(UserContext);
-    setPercentage(parseInt((doneHabit / (habitsArray.length > 0 ? habitsArray.length : 1)) * 100));
-
-    useEffect(() => {
-		const habitsRequisition = axios.get(url, config);
-
-		habitsRequisition.then(answer => {
-			setHabitsArray([...answer.data]);
-            if(habitsArray.length > 0) {
-                habitsArray.forEach(element => {
-                    if(element.done === true) {
-                        setDoneHabit(doneHabit+1);
-                    }
-                });
-            }
-		});
-        habitsRequisition.catch(() => alert("Erro!"));
-    }, []);
-
+    
     const localeData = require('dayjs/plugin/localeData')
     dayjs.extend(localeData)
 
@@ -70,7 +66,7 @@ export default function Today() {
     dayjs.locale('pt-br');
     const weekDay = dayjs.weekdays();
     const day = dayjs().get('date');
-    const month = dayjs().get('month')+1;
+    const month = dayjs().get('month') + 1;
 
     return (
         <TodayBody>
@@ -79,11 +75,12 @@ export default function Today() {
                 <h1>{weekDay[dayjs().day()]}, {day < 10 ? "0" + day : day}/{month < 10 ? "0" + month : month}</h1>
                 <h2>{donePercentage()[1]}</h2>
             </Box>
-            {habitsArray.map(element => {
-                const {id, name, done, currentSequence, highestSequence} = element;
-                
+            {habitsArray.map((element, index) => {
+                const arr = [...habitsArray];
+                const { id, name, done, currentSequence, highestSequence } = element;
+
                 return (
-                    <HabitBox2 name={name} done={done} currentSequence={currentSequence} highestSequence={highestSequence} id={id} func={setHabitsArray} key={id} />
+                    <HabitBox2 name={name} done={done} currentSequence={currentSequence} highestSequence={highestSequence} id={id} arr={arr} index={index} setHabitsArray={setHabitsArray} key={id} />
                 );
             }
             )}
@@ -124,3 +121,34 @@ const Box = styled.div`
         ${fontDefault};
     }
 `;
+/*
+if (counter > 0) {
+    setCounter(0);
+    habitsArray.forEach(element => {
+        if (element.done === true) {
+            setDoneHabit(doneHabit + 1);
+        }
+    });
+} else {
+    setCounter(1);
+}
+
+console.log(doneHabit);
+*/
+
+
+/*
+    const [counter, setCounter] = useState(0);
+
+    
+
+
+*/
+
+/*
+
+*/
+
+// func1={setHabitsArray} func2={setDoneHabit} doneHabit={doneHabit}
+
+// 
