@@ -76,7 +76,10 @@ export default function NewHabitBox(props) {
                 habitsRequisition.catch(() => alert("Erro!"));
             }
             );
-            newHabitRequisition.catch(() => alert("Erro!"));
+            newHabitRequisition.catch(() => {
+                alert("Erro!");
+                setLoading("Salvar");
+            });
         }, 2000);
     }
 

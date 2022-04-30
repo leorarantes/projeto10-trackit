@@ -30,8 +30,9 @@ export default function Home() {
             navigate('/hoje', { replace: true })
         });
         loginRequisition.catch(answer => {
-            alert("Erro!");
-        })
+            alert("Erro! Usuário ou senha inválidos!");
+            setLoading("Entrar");
+        });
     }
 
     const [user, setUser] = useState({email: "", password: ""});
@@ -44,7 +45,7 @@ export default function Home() {
             obj.email = e.target.value;
             setUser({...obj});
         }} />
-        <HomeInput type="text" placeholder="senha" value={user.password} onChange={e => {
+        <HomeInput type="password" placeholder="senha" value={user.password} onChange={e => {
             const obj = {...user};
             obj.password = e.target.value;
             setUser({...obj});

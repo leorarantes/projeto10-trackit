@@ -22,7 +22,8 @@ export default function Register() {
             navigate('/', { replace: true })
         });
         loginRequisition.catch(answer => {
-            alert("Erro!");
+            alert("Erro! Não foi possível realizar seu cadastro, tente novamente mais tarde!");
+            setLoading("Cadastrar");
         })
     }
 
@@ -46,7 +47,7 @@ export default function Register() {
                 obj.image = e.target.value;
                 setUser({ ...obj });
             }} />
-            <HomeInput type="text" placeholder="senha" value={user.password} onChange={e => {
+            <HomeInput type="password" placeholder="senha" value={user.password} onChange={e => {
                 const obj = { ...user };
                 obj.password = e.target.value;
                 setUser({ ...obj });
